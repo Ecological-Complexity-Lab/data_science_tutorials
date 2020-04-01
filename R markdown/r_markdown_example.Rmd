@@ -1,0 +1,47 @@
+---
+title: "R Markdown example"
+subtitle: "The basics to get you started"
+author: "Shai Pilosof"
+date: "March 31, 2020"
+output: html_document
+---
+
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) # global options. see more in the cheat sheet
+knitr::opts_knit$set(root.dir = "/Users/Shai/GitHub/") # basic working directory
+knitr:::read_chunk('/Users/Shai/GitHub/source_file.R') # An R file from which code can be taken.
+```
+
+# Cheat sheet
+Get it from [here](https://rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf).
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. 
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+# Running from a source R file.
+Between <<>> put the name of the chunk from `source_file.R`.
+```{r libs, echo=FALSE}
+<<load_libs>>
+```
+
+```{r plotting}
+<<plot_prices>>
+```
