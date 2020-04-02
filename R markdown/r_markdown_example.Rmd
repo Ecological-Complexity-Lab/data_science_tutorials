@@ -60,4 +60,19 @@ Plot something by calling code from the source file:
 <<plot_prices>>
 ```
 
+# Caching.
+This is very important when you have code that takes a long time to run and you do not want to re-run it every time you kint the document. See [tutorial](https://yihui.org/knitr/options/#cache).
+
+## Cache example
+First time you knit, it will run the `modularity` chunk and put it in the cache in folder r_markdown_example_cache. Then the second time you knit it will skip the `modularity` chunk but still plt the modules because it reads it from the cache.
+
+```{r modularity, cache=TRUE}
+library(bipartite)
+Q_obs <- computeModules(memmott1999)
+```
+
+```{r plot modules, dependson='modularity'}
+plotModuleWeb(Q_obs)
+```
+
 # References
