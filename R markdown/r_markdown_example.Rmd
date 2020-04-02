@@ -3,22 +3,34 @@ title: "R Markdown example"
 subtitle: "The basics to get you started"
 author: "Shai Pilosof"
 date: "March 31, 2020"
+bibliography: references.bib
 output: html_document
 ---
 
   
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE) # global options. see more in the cheat sheet
-knitr::opts_knit$set(root.dir = "/Users/Shai/GitHub/") # basic working directory
-knitr:::read_chunk('/Users/Shai/GitHub/source_file.R') # An R file from which code can be taken.
+knitr::opts_knit$set(root.dir = "/Users/Shai/GitHub/data_science_tutorials/R markdown/") # basic working directory
+knitr:::read_chunk('/Users/Shai/GitHub/data_science_tutorials/R markdown/source_file.R') # A .R file from which code can be sourced.
 ```
 
-# Cheat sheet
+# Start here
+
+## Tutorials
+
+1. [https://rmarkdown.rstudio.com/authoring_quick_tour.html#overview](https://rmarkdown.rstudio.com/authoring_quick_tour.html#overview)
+2. https://ourcodingclub.github.io/tutorials/rmarkdown/
+3. You cabn write basically whatever you want, [even references!](https://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html).
+
+## Cheat sheet
 Get it from [here](https://rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf).
 
-## R Markdown
+#Basic R Markdown examples
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. 
+
+A references example: See @Baskerville2011-mt
+
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
@@ -30,7 +42,7 @@ summary(cars)
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
+```{r pressure}
 plot(pressure)
 ```
 
@@ -38,10 +50,14 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 # Running from a source R file.
 Between <<>> put the name of the chunk from `source_file.R`.
-```{r libs, echo=FALSE}
+```{r libs, echo=TRUE, message=FALSE}
 <<load_libs>>
 ```
+
+Plot something by calling code from the source file:
 
 ```{r plotting}
 <<plot_prices>>
 ```
+
+# References
