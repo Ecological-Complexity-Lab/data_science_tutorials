@@ -1,38 +1,75 @@
 ---
-title: "R Markdown example"
+title: "R Markdown tutorial"
 subtitle: "The basics to get you started"
 author: "Shai Pilosof"
-date: "March 31, 2020"
+date: "April 27, 2020"
 bibliography: references.bib
 output: html_document
 ---
 
   
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE) # global options. see more in the cheat sheet
-knitr::opts_knit$set(root.dir = "/Users/Shai/GitHub/data_science_tutorials/R markdown/") # basic working directory
-knitr:::read_chunk('/Users/Shai/GitHub/data_science_tutorials/R markdown/source_file.R') # A .R file from which code can be sourced.
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE) # global options. see more in the cheat sheet
+knitr::opts_knit$set(root.dir = "/Users/Shai/GitHub/ecomplab/data_science_tutorials/R markdown/") # basic working directory
+knitr:::read_chunk('/Users/Shai/GitHub/ecomplab/data_science_tutorials/R markdown/source_file.R') # A .R file from which code can be sourced.
 ```
 
 # Start here
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, GitHub markdown, PDF, and MS Word documents. When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. I have compiled some basic examples here, most of which I took from resources on the web, like the ones in the next section.
 
 ## Tutorials
 
-1. [https://rmarkdown.rstudio.com/authoring_quick_tour.html#overview](https://rmarkdown.rstudio.com/authoring_quick_tour.html#overview)
-2. https://ourcodingclub.github.io/tutorials/rmarkdown/
-3. You cabn write basically whatever you want, [even references!](https://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html).
+1. [Rstudio's tutorial](https://rmarkdown.rstudio.com/authoring_quick_tour.html#overview).
+2. [Super-usedful for the basics](https://ourcodingclub.github.io/tutorials/rmarkdown/).
+3. [https://bookdown.org/yihui/rmarkdown/](https://bookdown.org/yihui/rmarkdown/).
+4. [Including references](https://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html).
 
-## Cheat sheet
-Get it from [here](https://rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf).
+## Cheet sheets
 
-#Basic R Markdown examples
+1. [Basic cheaty sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
+2. [Official cheat sheet](https://rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf).
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. 
+# Basic R Markdown examples
 
-A references example: See @Baskerville2011-mt
+Text can be written in bold, and italic.
+Lists:
 
+- Item 1
+  - Item 1.1
+- Item 2
+- Item 3
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+A references example: See @Baskerville2011-mt and also like this: [@Baskerville2011-mt].
+
+It is also possible to write math: $y=ae^{=\beta\cdot x}$ or between lines:
+
+$$
+\Theta = \begin{pmatrix}
+\alpha & \beta\\
+\gamma & \delta
+\end{pmatrix}
+$$
+
+Possible to include tables:
+
+```{r tables-mtcars}
+knitr::kable(iris[1:5, ], caption = 'A caption')
+```
+
+But this will not work for github_document where a markdown approach is needed:
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+(Colons can be used to align columns.)
+
+> A quote can be written too!
+
+# Embedding code
+
+You can embed an R code chunk like this:
 
 ```{r cars}
 summary(cars)
@@ -49,7 +86,8 @@ plot(pressure)
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 # Running from a source R file.
-Between <<>> put the name of the chunk from `source_file.R`.
+Between <<>> put the name of the chunk from `source_file.R`. like this: <<load_libs>>.
+
 ```{r libs, echo=TRUE, message=FALSE}
 <<load_libs>>
 ```
@@ -60,11 +98,11 @@ Plot something by calling code from the source file:
 <<plot_prices>>
 ```
 
-# Caching.
+# Caching
 This is very important when you have code that takes a long time to run and you do not want to re-run it every time you kint the document. See [tutorial](https://yihui.org/knitr/options/#cache).
 
 ## Cache example
-First time you knit, it will run the `modularity` chunk and put it in the cache in folder r_markdown_example_cache. Then the second time you knit it will skip the `modularity` chunk but still plt the modules because it reads it from the cache.
+First time you knit, it will run the `modularity` chunk and put it in the cache in folder r_markdown_example_cache. Then the second time you knit it will skip the `modularity` chunk but still plot the modules because it reads it from the cache.
 
 ```{r modularity, cache=TRUE}
 library(bipartite)
@@ -73,6 +111,64 @@ Q_obs <- computeModules(memmott1999)
 
 ```{r plot modules, dependson='modularity'}
 plotModuleWeb(Q_obs)
+```
+
+# A real example using COVID19 data.
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(lubridate)
+library(deSolve)
+library(R0)
+
+# Get data
+covid19 <- read_csv('time_series_covid19_confirmed_global.csv')
+covid19 %<>%
+  dplyr::select(-`Province/State`, -Lat, -Long) %>%
+  rename(country=`Country/Region`) %>%
+  gather(key=d, value, -country) %>%
+  # filter(country=='Australia', d=='2/2/20') %>% # for checking that the grouping is correct
+  group_by(country, d) %>%
+  summarise(cases=sum(value)) %>%
+  separate(d, into=c('month','day','year')) %>%
+  mutate(date=as_date(paste(year,month,day,sep='-'))) %>%
+  arrange(country,date)
+
+# Define functions
+covid19_country <- function(the_country){
+  x <- covid19%>%
+    filter(country==the_country) %>%
+    mutate(running_day=row_number())
+  return(x)
+}
+
+R0_country <- function(the_country,...){
+  # Estimate R0 from data
+  mGT<-generation.time("gamma", c(3, 1.5))
+  x <- covid19_country(the_country)
+  y <- x$cases
+  names(y) <- x$date
+  R0 <- est.R0.EG(y, mGT,...)
+  R0
+}
+```
+
+# What does the data say?
+
+Using data on confirmed cases from [https://github.com/CSSEGISandData/COVID-19](https://github.com/CSSEGISandData/COVID-19), we can look at the number of confirmed cases in different countries. You can see in the plot how China is already at a plateou, probably due to strict measures by the government, whereas Israel and Spain are still in the exponential phase (but with very different numbers!)
+
+```{r cases, echo=TRUE, message=FALSE, warning=FALSE}
+# Some exploratory analysis
+covid19 %>%
+  filter(country=='Spain' | country=='Israel' | country=='China' | country=='US') %>%
+  ggplot(aes(date, cases, color=country))+
+    facet_wrap(~country, scales='free')+
+    geom_point()+
+    geom_line()+
+    theme_bw()+
+    theme(legend.position = 'none')+
+    scale_color_manual(values = c('red','blue','orange', 'navy'))
 ```
 
 # References
